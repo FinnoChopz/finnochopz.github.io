@@ -53,7 +53,7 @@
             font-size: 5rem;
             margin: 0;
             color: var(--xmas-red);
-            text-shadow: 0 0 10px var(--xmas-red), 0 0 20px var(--xmas-red);
+            text-shadow: 0 0 5px var(--xmas-red);
             animation: glow 2s ease-in-out infinite alternate;
         }
 
@@ -83,8 +83,8 @@
         }
 
         @keyframes glow {
-            from { text-shadow: 0 0 10px var(--xmas-red), 0 0 20px var(--xmas-red); }
-            to { text-shadow: 0 0 20px var(--xmas-red), 0 0 30px #ff6666, 0 0 40px #ff6666; }
+            from { text-shadow: 0 0 5px var(--xmas-red); }
+            to { text-shadow: 0 0 10px var(--xmas-red), 0 0 15px #ff6666; }
         }
 
         @keyframes blink {
@@ -124,18 +124,18 @@
 
     <script>
         // Typing Effect
-        const textToType = "You will be learning how to code_";
+        const textToType = "You will be learning how to code";
         const typingElement = document.getElementById('typing-text');
         let charIndex = 0;
 
         function typeText() {
-            if (charIndex < textToType.length - 1) {
+            if (charIndex < textToType.length) {
                 typingElement.textContent += textToType.charAt(charIndex);
                 charIndex++;
                 setTimeout(typeText, 100);
             } else {
-                // Replace underscore with blinking cursor span
-                typingElement.innerHTML = typingElement.textContent.slice(0, -1) + '<span class="cursor"></span>';
+                // Add blinking cursor span
+                typingElement.innerHTML = typingElement.textContent + '<span class="cursor"></span>';
             }
         }
         
