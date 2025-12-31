@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merry Christmas & Happy Coding!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --xmas-red: #ff3333;
+            --xmas-green: #00ff88; /* Neon green for coding vibe */
+            --xmas-gold: #ffd700;
+            --bg-color: #0a0a12;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: 'Fira Code', monospace;
+            color: #fff;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            text-align: center;
+            pointer-events: none; /* Let clicks pass through to canvas */
+            width: 90%;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-family: 'Berkshire Swash', cursive;
+            font-size: 5rem;
+            margin: 0;
+            color: var(--xmas-red);
+            text-shadow: 0 0 10px var(--xmas-red), 0 0 20px var(--xmas-red);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--xmas-green);
+            margin-top: 20px;
+            text-shadow: 0 0 5px var(--xmas-green);
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: var(--xmas-gold);
+            margin-top: 30px;
+            line-height: 1.6;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out 1s forwards;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background-color: var(--xmas-green);
+            animation: blink 1s step-end infinite;
+            vertical-align: bottom;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px var(--xmas-red), 0 0 20px var(--xmas-red); }
+            to { text-shadow: 0 0 20px var(--xmas-red), 0 0 30px #ff6666, 0 0 40px #ff6666; }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .interactive-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            z-index: 2;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="bgCanvas"></canvas>
+    </div>
+
+    <div class="content">
+        <h1>Merry Christmas</h1>
+        <h2 id="typing-text"></h2>
+        <p>The gift that keeps on giving,<br>the gift of the AI tool.</p>
+    </div>
+
+    <div class="interactive-hint">Click anywhere to celebrate!</div>
+
+    <script>
+        // Typing Effect
+        const textToType = "You will be learning how to code_";
+        const typingElement = document.getElementById('typing-text');
+        let charIndex = 0;
+
+        function typeText() {
+            if (charIndex < textToType.length - 1) {
+                typingElement.textContent += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeText, 100);
+            } else {
+                // Replace underscore with blinking cursor span
+                typingElement.innerHTML = typingElement.textContent.slice(0, -1) + '<span class="cursor"></span>';
+            }
+        }
+        
+        setTimeout(typeText, 1000);
+
+        // Canvas Animation
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        
+        // Symbols: Snowflakes and Code characters
+        const symbols = ['❄', '❅', '❆', '{', '}', '<', '>', '/', ';', '0', '1'];
+        const colors = ['#ffffff', '#00ff88', '#ff3333', '#ffd700'];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, type = 'fall') {
+                this.x = x || Math.random() * width;
+                this.y = y || Math.random() * height;
+                this.size = Math.random() * 20 + 10;
+                this.speedY = Math.random() * 1 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.opacity = Math.random() * 0.5 + 0.3;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+                this.type = type; // 'fall' or 'explode'
+                
+                if (type === 'explode') {
+                    this.speedX = (Math.random() - 0.5) * 10;
+                    this.speedY = (Math.random() - 0.5) * 10;
+                    this.decay = Math.random() * 0.02 + 0.01;
+                    this.size = Math.random() * 15 + 10;
+                }
+            }
+
+            update(mouseX, mouseY) {
+                if (this.type === 'fall') {
+                    this.y += this.speedY;
+                    this.x += this.speedX;
+                    this.rotation += this.rotationSpeed;
+
+                    // Mouse interaction (repel)
+                    const dx = this.x - mouseX;
+                    const dy = this.y - mouseY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const maxDistance = 150;
+
+                    if (distance < maxDistance) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (maxDistance - distance) / maxDistance;
+                        this.x += forceDirectionX * force * 5;
+                        this.y += forceDirectionY * force * 5;
+                    }
+
+                    // Reset if out of bounds
+                    if (this.y > height + 50) {
+                        this.y = -50;
+                        this.x = Math.random() * width;
+                    }
+                } else if (this.type === 'explode') {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.opacity -= this.decay;
+                    this.rotation += this.rotationSpeed * 3;
+                    this.speedY += 0.1; // Gravity
+                }
+            }
+
+            draw() {
+                if (this.opacity <= 0) return;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.font = `${this.size}px 'Fira Code'`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.symbol, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.min(width * 0.1, 150); // Responsive count
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        initParticles();
+
+        // Mouse tracking
+        let mouseX = -1000;
+        let mouseY = -1000;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Click explosion
+        window.addEventListener('click', (e) => {
+            for (let i = 0; i < 20; i++) {
+                particles.push(new Particle(e.clientX, e.clientY, 'explode'));
+            }
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Filter out dead explosion particles
+            particles = particles.filter(p => p.opacity > 0);
+
+            particles.forEach(p => {
+                p.update(mouseX, mouseY);
+                p.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+    </script>
+</body>
+</html>
